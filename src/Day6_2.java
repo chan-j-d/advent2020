@@ -1,8 +1,10 @@
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-public class Day6_1 {
+public class Day6_2 {
 
     private static final String LINE_SEPARATOR = "";
 
@@ -30,16 +32,21 @@ public class Day6_1 {
 
     static class GroupAnswers {
 
-        Set<Character> setOfAnswers;
+        List<Set<Character>> listOfPersonAnswers;
         int numPersonsInGroup;
 
         GroupAnswers() {
-            setOfAnswers = new HashSet<>();
+            listOfPersonAnswers = new ArrayList<>();
             numPersonsInGroup = 0;
         }
 
         int getCount() {
-            return setOfAnswers.size();
+            System.out.println(listOfPersonAnswers);
+            return (int) listOfPersonAnswers.get(0)
+                    .stream()
+                    .filter(c -> listOfPersonAnswers.stream()
+                            .allMatch(set -> set.contains(c)))
+                    .count();
         }
 
         int getNumPersonsInGroup() {
@@ -47,9 +54,12 @@ public class Day6_1 {
         }
 
         void addAnswers(String answers) {
+            Set<Character> newPersonAnswers = new HashSet<>();
             for (int i = 0; i < answers.length(); i++) {
-                setOfAnswers.add(answers.charAt(i));
+                newPersonAnswers.add(answers.charAt(i));
             }
+            listOfPersonAnswers.add(newPersonAnswers);
+
             numPersonsInGroup++;
         }
 
