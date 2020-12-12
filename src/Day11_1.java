@@ -72,47 +72,55 @@ public class Day11_1 {
         boolean toFlip(int row, int column) {
             char seatState = getStateAt(row, column);
             if (seatState == SQUARE_EMPTY) {
-                for (int i = row - 1; i <= row + 1; i++) {
-                    for (int j = column - 1; j <= column + 1; j++) {
-                        if (i == row && j == column) {
-                            continue;
-                        } else if (isOutOfBounds(i, j)) {
-                            continue;
-                        }
-
-                        if (getStateAt(i, j) == SQUARE_OCCUPIED) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
+                return getAdjacentCount(row, column) == 0;
             } else if (seatState == SQUARE_FLOOR) {
                 return false;
             } else if (seatState == SQUARE_OCCUPIED) {
-                int count = 0;
-                for (int i = row - 1; i <= row + 1; i++) {
-                    for (int j = column - 1; j <= column + 1; j++) {
-                        if (i == row && j == column) {
-                            continue;
-                        } else if (isOutOfBounds(i, j)) {
-                            continue;
-                        }
-
-                        if (getStateAt(i, j) == SQUARE_OCCUPIED) {
-                            count++;
-                        }
-                    }
-                }
-                return count >= 4;
+                return getAdjacentCount(row, column) >= 5;
             } else {
                 throw new IllegalArgumentException("Not a valid state");
             }
         }
 
+        int getAdjacentCount(int row, int column) {
+            int count = 0;
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    if (i == 0 && j == 0) {
+                        continue;
+                    }
+                    if (isAdjacentDirectionOccupied(row, column, i, j)) {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        boolean isAdjacentDirectionOccupied(int row, int column, int rowChange, int columnChange) {
+            int i = row, j = column;
+            while (true) {
+                i = i + rowChange;
+                j = j + columnChange;
+                if (isOutOfBounds(i, j)) {
+                    return false;
+                }
+
+                char state = getStateAt(i, j);
+                if (state == SQUARE_OCCUPIED) {
+                    return true;
+                } else if (state == SQUARE_EMPTY) {
+                    return false;
+                } else if (state == SQUARE_FLOOR) {
+                    continue;
+                } else {
+                    throw new IllegalArgumentException("illegal state");
+                }
+            }
+        }
+
         boolean isOutOfBounds(int row, int column) {
-            boolean isRowOutOfBounds = row < 0 || row >= getNumRows();
-            boolean isColumnOutOfBounds = column < 0 || column >= getNumColumns();
-            return isRowOutOfBounds || isColumnOutOfBounds;
+            return (row < 0 || row >= getNumRows()) || (column < 0 || column >= getNumColumns());
         }
 
         void markTileToBeFlipped(int row, int column) {
