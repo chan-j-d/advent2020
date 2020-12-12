@@ -16,6 +16,7 @@ public class Day12_1 {
 
         Ship ship = new Ship();
         instructions.stream()
+                .peek(x -> System.out.println(ship))
                 .peek(System.out::println)
                 .forEach(i -> ship.executeInstruction(i));
 
@@ -115,12 +116,12 @@ public class Day12_1 {
             while (num90Turns != 0) {
                 if (isRight) {
                     int temp = wY;
-                    wY = wX;
-                    wX = -wY;
+                    wY = -wX;
+                    wX = temp;
                 } else {
                     int temp = wX;
                     wX = -wY;
-                    wY = wX;
+                    wY = temp;
                 }
 
                 num90Turns--;
@@ -129,6 +130,10 @@ public class Day12_1 {
 
         int getManhattanDistance() {
             return Math.abs(x) + Math.abs(y);
+        }
+
+        public String toString() {
+            return "(x, y) = " + x + ", " + y + " | (wX, wY) = " + wX + ", " + wY;
         }
 
     }
