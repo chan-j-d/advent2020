@@ -1,6 +1,8 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Day13_2 {
@@ -12,7 +14,13 @@ public class Day13_2 {
         scanner.useDelimiter("[,]");
 
         List<IntPair> idIndexMaps = new ArrayList<>();
+
         int index = 0;
+        boolean isFirst = true;
+        int firstValue = -1;
+        long sum = 0;
+        long factor = 1;
+
         while (scanner.hasNext()) {
             String nextValue = scanner.next();
             if (nextValue.equals(NOT_AVAILBLE)) {
@@ -21,36 +29,67 @@ public class Day13_2 {
             }
 
             int value = Integer.parseInt(nextValue.trim());
-            idIndexMaps.add(new IntPair(value, index++));
+            if (isFirst) {
+                isFirst = false;
+                firstValue = value;
+                factor = firstValue;
+                index++;
+            } else {
+                System.out.println("sum: " + sum + ", factor: " + factor + ", value: " + value + ", index: " + index);
+                long multiplier = getMultiplierForLeftover(factor, value,  (sum % value) + index++);
+                sum = sum + multiplier * factor;
+                factor = factor * value;
+            }
+        }
+        System.out.println(sum);
 
+    }
+
+    static long getMultiplierForLeftover(long multiplier, int id, long leftover) {
+        long returnMultiplier = 1;
+        long value = multiplier + leftover;
+        while (true) {
+            if (value == 0) {
+                return returnMultiplier;
+            }
+
+            value = value + multiplier;
+            returnMultiplier++;
+            if (value >= id) {
+                value = value - (value / id) * id;
+            }
+        }
+    }
+
+    static class IncrementChecker {
+
+        int multiplier;
+
+        Map<Integer, Map<Integer, Long>> idToMultiplierMap;
+
+        IncrementChecker(int multiplier) {
+            this.multiplier = multiplier;
+            idToMultiplierMap = new HashMap<>();
         }
 
-        BigInteger multiplier = BigInteger.ONE;
-        while (true) {
-
-            BigInteger startingTValue = idIndexMaps.get(0).first.multiply(multiplier);
-            multiplier = multiplier.add(BigInteger.ONE);
-            boolean isNotFound = false;
-            for (IntPair pair : idIndexMaps) {
-                BigInteger id = pair.first;
-                BigInteger listIndex = pair.second;
-
-                System.out.println(id + ": " + listIndex);
-                if (!(startingTValue.add(listIndex)).mod(id).equals(BigInteger.ZERO)) {
-                    isNotFound = true;
-                    break;
+        long getMultiplier(int id, int leftover) {
+            if (idToMultiplierMap.containsKey(id)) {
+                Map<Integer, Long> leftoverToMultiplierMap = idToMultiplierMap.get(id);
+                if (leftoverToMultiplierMap.containsKey(leftover)) {
+                    return leftoverToMultiplierMap.get(multiplier);
                 }
             }
-
-            if (isNotFound) {
-                continue;
-            }
-
-
-            System.out.println(startingTValue);
-            return;
+            return 0L;
         }
 
+        long getMultiplierForSpecificLeftover(int id, int leftover) {
+            Map<Integer, Integer> leftoverToCountMap = new HashMap<>();
+            if (!idToMultiplierMap.containsKey(id)) {
+                idToMultiplierMap.put(id, new HashMap<>());
+            }
+            Map<Integer, Long> leftoverToMultiplierMap = idToMultiplierMap.get(id);
+            return 0L;
+        }
 
     }
 
