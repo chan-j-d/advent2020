@@ -7,7 +7,7 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 
-public class Day23_1 {
+public class Day23_2 {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -18,11 +18,35 @@ public class Day23_1 {
             cups.addCup(Integer.parseInt(cupsString.charAt(i) + ""));
         }
 
-        for (int i = 0; i < 100; i++) {
-            cups.simulateTurn();
+        for (int i = 10; i <= 100; i++) {
+            cups.addCup(i);
         }
 
+        Set<List<Integer>> visitedSets = new HashSet<>();
+        for (int i = 0; i < 100000; i++) {
+            cups.simulateTurn();
+            System.out.println(cups);
+            if (i % 1000 == 0) {
+                System.out.println(i);
+            }
 
+            if (visitedSets.contains(cups.cups)) {
+                System.out.println(cups.cups);
+                break;
+            } else {
+                visitedSets.add(cups.cups);
+            }
+        }
+
+        System.out.println(getTwoBesideOne(cups.cups));
+
+    }
+
+    static List<Integer> getTwoBesideOne(List<Integer> list) {
+        int index = list.indexOf(1);
+        int firstIndex = index + 1 >= list.size() ? 0 : index + 1;
+        int secondIndex = firstIndex + 1 >= list.size() ? 0 : firstIndex + 1;
+        return List.of(list.get(firstIndex), list.get(secondIndex));
     }
 
     static class Cups {
@@ -53,21 +77,29 @@ public class Day23_1 {
             do {
                 referenceValue = referenceValue - 1;
                 if (referenceValue == -1) {
-                    referenceValue = cups.stream()
-                            .max(Comparator.naturalOrder()).get();
+                    if (cups.contains(1000000)) {
+                        referenceValue = 1000000;
+                    } else if (cups.contains(999999)) {
+                        referenceValue = 999999;
+                    } else if (cups.contains(999998)) {
+                        referenceValue = 999998;
+                    } else {
+                        referenceValue = 999997;
+                    }
                 }
-                System.out.println(referenceValue);
             } while (!cups.contains(referenceValue));
+            System.out.println(referenceValue);
 
             int indexOfRefValue = cups.indexOf(referenceValue);
-            System.out.println("extracted numbers" + threeValues);
+            if (indexOfRefValue == cups.size() - 1) {
+                indexOfRefValue = -1;
+            }
             for (int i = 1; i <= 3; i++) {
                 cups.add(indexOfRefValue + i, threeValues.poll());
                 if (indexOfRefValue < markedCupIndex) {
                     markedCupIndex++;
                 }
             }
-            System.out.println(cups);
 
             markedCupIndex = markedCupIndex + 1;
             if (markedCupIndex >= cups.size()) {
